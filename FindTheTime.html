@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When are you free?</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F5F3EE; --surface:#FFFFFF; --surface2:#EEEAE2; --border:rgba(0,0,0,.07); --border-md:rgba(0,0,0,.13);
+  --text:#181816; --text2:#68665E; --text3:#A8A59D;
+  --accent:#181816;
+  --green:#1E6B45; --green-bg:#DCF0E5;
+  --amber:#7A4A00; --amber-bg:#FEF0D0;
+  --red:#991F1F;   --red-bg:#FDEAEA;
+  --radius:18px; --radius-md:12px; --radius-sm:8px;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;flex:1;padding:20px;gap:16px;animation:fu .22s ease}
+.screen.active{display:flex}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.header{padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase}
+.page-title{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.page-sub{font-size:14px;color:var(--text2);margin-top:4px}
+.sec-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card-p{padding:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:var(--radius-md);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff;width:100%}
+.btn-primary:hover{background:#2a2a28}
+.btn-secondary{background:var(--surface);color:var(--text);border:1.5px solid var(--border-md);width:100%}
+.btn-secondary:hover{background:var(--surface2)}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:10px;width:auto}
+.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text2);cursor:pointer;padding:0;margin-bottom:2px}
+.back-btn:hover{color:var(--text)}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:12px;font-weight:500;color:var(--text2)}
+.fi{padding:11px 13px;border:1.5px solid var(--border-md);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(24,24,22,.07)}
+.fsel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2368665E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:3px}
+.tag-call{background:#EEE9FF;color:#3D2B8C}
+.tag-person{background:#FFF0E0;color:#7D3C00}
+.tag-either{background:#E6F9EE;color:#1E6B45}
+.tag-travel{background:#D6EAF8;color:#1B4F72}
+.tag-social{background:#FDDBD8;color:#922B21}
+.tag-work{background:#E8EAED;color:#515A5A}
+.tag-sports{background:#D5F5E3;color:#1E8449}
+.tag-culture{background:#E8DAEF;color:#6C3483}
+.tag-other{background:#FAE5D3;color:#784212}
+.pill-group{display:flex;gap:6px;flex-wrap:wrap}
+.pill-opt{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border-md);background:var(--surface);color:var(--text2);transition:all .15s}
+.pill-opt.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.entry{display:flex;align-items:flex-start;gap:11px;padding:13px 16px;border-bottom:1px solid var(--border);transition:background .12s}
+.entry:last-child{border-bottom:none}
+.entry:hover{background:var(--surface2)}
+.e-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.e-body{flex:1;min-width:0}
+.e-title{font-size:14px;font-weight:500;line-height:1.3}
+.e-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.e-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.icon-btn{width:30px;height:30px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:background .12s,color .12s;flex-shrink:0}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+.empty-state{text-align:center;padding:28px 20px;color:var(--text3);font-size:14px}
+
+/* ── Share box ── */
+.share-box{background:var(--surface2);border-radius:var(--radius-sm);padding:14px}
+.share-url{font-family:'DM Mono',monospace;font-size:11px;line-height:1.6;word-break:break-all;color:var(--text2);margin-bottom:10px;user-select:all;cursor:text}
+.share-hint{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5}
+
+/* ── Calendar ── */
+.cal-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+.cal-month-lbl{font-size:15px;font-weight:600}
+.cal-nav-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border-md);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background .12s}
+.cal-nav-btn:hover{background:var(--surface2)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;padding:0 10px 10px}
+.cal-dow{font-size:10px;font-weight:600;color:var(--text3);text-align:center;padding:5px 0;text-transform:uppercase;letter-spacing:.05em}
+.cal-cell{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:1;font-size:13px;color:var(--text2);transition:background .12s;border-radius:8px}
+.cal-cell.today{font-weight:700;color:var(--text)}
+.cal-cell.other-month{color:var(--text3);opacity:.4}
+.cal-cell.has-ev{cursor:pointer;font-weight:600;color:var(--text)}
+.cal-cell.has-ev:hover{background:var(--surface2)}
+.cal-cell.r-mid{background:#E5E1D6;border-radius:0;color:var(--text)}
+.cal-cell.r-start{background:var(--accent);color:#fff;border-radius:8px 0 0 8px}
+.cal-cell.r-end{background:var(--accent);color:#fff;border-radius:0 8px 8px 0}
+.cal-cell.r-single{background:var(--accent);color:#fff;border-radius:8px}
+.cal-dots{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);display:flex;gap:2px}
+.cal-dot{width:4px;height:4px;border-radius:50%}
+.cal-ev-section{border-top:1px solid var(--border)}
+.cal-day-hd{padding:10px 16px 6px;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;background:var(--surface2)}
+.ev-row{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.ev-row:last-child{border-bottom:none}
+.ev-body{flex:1;min-width:0}
+.ev-title{font-size:14px;font-weight:500;line-height:1.3}
+.ev-meta{font-size:12px;color:var(--text2);margin-top:1px}
+.ev-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+
+/* ── Avail ── */
+.avail-card{padding:14px 16px;border-bottom:1px solid var(--border)}
+.avail-card:last-child{border-bottom:none}
+.avail-title{font-size:14px;font-weight:500;line-height:1.3}
+.avail-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.avail-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;margin-bottom:8px}
+.avail-btns{display:flex;gap:7px}
+.avail-btn{flex:1;padding:9px 6px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border-md);background:var(--surface2);color:var(--text2);transition:all .15s;text-align:center;font-family:'DM Sans',sans-serif}
+.avail-btn.sel-yes  {background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.avail-btn.sel-maybe{background:var(--amber-bg);border-color:var(--amber);color:var(--amber)}
+.avail-btn.sel-no   {background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.rb{font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.rb-yes  {background:var(--green-bg);color:var(--green)}
+.rb-maybe{background:var(--amber-bg);color:var(--amber)}
+.rb-no   {background:var(--red-bg);color:var(--red)}
+.rb-none {background:var(--surface2);color:var(--text3)}
+
+/* ── Modal ── */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.mo.open{display:flex}
+.modal{background:var(--surface);border-radius:22px 22px 0 0;padding:0 0 28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:su .22s ease}
+@keyframes su{from{transform:translateY(32px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhandle{width:36px;height:4px;background:var(--border-md);border-radius:2px;margin:11px auto 3px}
+.mhead{padding:10px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.mtitle{font-size:16px;font-weight:600}
+.mbody{padding:18px;display:flex;flex-direction:column;gap:13px}
+.mfoot{padding:0 18px;display:flex;gap:9px}
+
+/* ── Info banner ── */
+.info-banner{background:#EEE9FF;border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:#3D2B8C;line-height:1.5}
+.info-banner strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header"><span class="logo">📅 When are you free?</span></div>
+
+  <!-- ═══ HOME ═══ -->
+  <div class="screen active" id="s-home">
+    <div>
+      <div class="page-title">Your dates</div>
+      <div class="page-sub">Add, edit, then share a link with your friend.</div>
+    </div>
+
+    <div class="fg">
+      <label class="fl">Your name</label>
+      <input class="fi" type="text" id="org-name" placeholder="e.g. Anna" oninput="saveAll()" style="max-width:260px">
+    </div>
+
+    <div>
+      <div class="sec-label">Proposed dates</div>
+      <div class="card">
+        <div id="entry-list"></div>
+        <div style="padding:12px 16px">
+          <button class="btn btn-secondary btn-sm" onclick="openAddModal()" style="gap:5px">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Add date
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">Share with your friend</div>
+      <div class="card">
+        <div class="card-p" style="border-bottom:1px solid var(--border)">
+          <div style="font-size:14px;color:var(--text2);margin-bottom:12px">Click below to generate a shareable link. Send it to your friend — they click it and land straight on the calendar. No file, no setup.</div>
+          <button class="btn btn-primary" onclick="generateLink()">Generate shareable link</button>
+        </div>
+        <div class="card-p" id="link-output" style="display:none">
+          <div class="sec-label">Your link</div>
+          <div class="share-box">
+            <div class="share-url" id="share-url-text"></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-secondary btn-sm" onclick="copyLink()" id="copy-btn" style="flex:1">Copy link</button>
+              <button class="btn btn-secondary btn-sm" onclick="previewAsFriend()" style="flex:1">Preview ↗</button>
+            </div>
+            <div class="share-hint">Send this link via WhatsApp, email, or iMessage. Your friend clicks it and sees the calendar directly — <strong>no file download needed</strong>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-label">Results</div>
+      <div class="card card-p">
+        <div style="font-size:14px;color:var(--text2);margin-bottom:10px">See how your friend responded.</div>
+        <button class="btn btn-secondary" onclick="showResults()">View responses</button>
+      </div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- ═══ FRIEND VIEW ═══ -->
+  <div class="screen" id="s-friend">
+    <div>
+      <button class="back-btn" onclick="show('s-home')">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M9.5 3L5 7.5 9.5 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <div class="page-title" id="f-title">Dates</div>
+      <div class="page-sub">Tap a highlighted day or scroll down to respond.</div>
+    </div>
+
+    <div class="fg" style="max-width:260px">
+      <label class="fl">Your name</label>
+      <input class="fi" type="text" id="f-name" placeholder="e.g. Jonas">
+    </div>
+
+    <div class="cal-wrap">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M8 2.5L4.5 6.5 8 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="cal-month-lbl" id="cal-lbl"></span>
+        <button class="cal-nav-btn" onclick="calNext()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M5 2.5L8.5 6.5 5 10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-ev-section" id="cal-ev-section"></div>
+    </div>
+
+    <div>
+      <div class="sec-label">Mark your availability</div>
+      <div class="card" id="avail-list"></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitAvail()">Send my availability</button>
+    <div id="f-err" style="font-size:13px;color:var(--red);text-align:center;min-height:18px"></div>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- ═══ RESULTS ═══ -->
+  <div class="screen" id="s-results">
+    <div>
+      <button class="back-btn" onclick="show('s-home')">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M9.5 3L5 7.5 9.5 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <div class="page-title">Responses</div>
+      <div class="page-sub">How your friend responded.</div>
+    </div>
+    <div id="results-body"></div>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- ═══ THANKS ═══ -->
+  <div class="screen" id="s-thanks">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:40px 20px">
+      <div style="font-size:54px">🎉</div>
+      <div class="page-title">All done!</div>
+      <div style="font-size:15px;color:var(--text2);max-width:280px">Availability saved. The organiser will see your answers.</div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="show('s-home')">← Back to start</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="mo" id="mo" onclick="moClose(event)">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mtitle" id="mo-title">Add date</span>
+      <button class="icon-btn" onclick="moCloseDirect()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1l11 11M12 1L1 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">Title</label><input class="fi" type="text" id="m-title" placeholder="e.g. Weekend in Hamburg"></div>
+      <div class="row2">
+        <div class="fg"><label class="fl">Start date</label><input class="fi" type="date" id="m-start"></div>
+        <div class="fg"><label class="fl">End date</label><input class="fi" type="date" id="m-end"></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><label class="fl">Start time</label><input class="fi" type="time" id="m-ts"></div>
+        <div class="fg"><label class="fl">End time</label><input class="fi" type="time" id="m-te"></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Category</label>
+        <select class="fi fsel" id="m-cat">
+          <option value="travel">Travel</option>
+          <option value="social">Social</option>
+          <option value="work">Work</option>
+          <option value="sports">Sports / outdoors</option>
+          <option value="culture">Culture</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Format</label>
+        <div class="pill-group" id="fmt-pills">
+          <div class="pill-opt active" data-val="call" onclick="selFmt(this)">📞 Call</div>
+          <div class="pill-opt" data-val="in-person" onclick="selFmt(this)">🤝 In person</div>
+          <div class="pill-opt" data-val="either" onclick="selFmt(this)">Either</div>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-secondary btn-sm" id="m-del" onclick="delEntry()" style="display:none;color:var(--red);border-color:#f5b8b8">Delete</button>
+      <button class="btn btn-primary btn-sm" id="m-save" onclick="saveEntry()" style="flex:1">Add date</button>
+    </div>
+    <div style="height:4px"></div>
+  </div>
+</div>
+
+<script>
+// ── constants ────────────────────────────────────────────────────
+const CC={travel:'#1B4F72',social:'#922B21',work:'#515A5A',sports:'#1E8449',culture:'#6C3483',other:'#784212'};
+const CL={travel:'Travel',social:'Social',work:'Work',sports:'Sports / outdoors',culture:'Culture',other:'Other'};
+const MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MSHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── state ─────────────────────────────────────────────────────────
+let ST={name:'',dates:[
+  {id:1, title:'Weekend in Hamburg',start:'2026-04-03',end:'2026-04-05',ts:'',te:'',cat:'travel',fmt:'in-person'},
+  {id:2, title:'Bella comes to Berlin to hang and work on the Holiday',start:'2026-04-06',end:'2026-04-06',ts:'',te:'',cat:'other',fmt:'in-person'},
+  {id:3, title:"Let's talk about work",start:'2026-04-01',end:'2026-04-01',ts:'17:00',te:'18:30',cat:'work',fmt:'call'},
+  {id:4, title:"Let's talk about work",start:'2026-04-02',end:'2026-04-02',ts:'17:00',te:'18:30',cat:'work',fmt:'call'},
+  {id:5, title:"Let's talk about work",start:'2026-04-07',end:'2026-04-07',ts:'17:00',te:'18:30',cat:'work',fmt:'call'},
+  {id:6, title:"Let's talk about work",start:'2026-04-08',end:'2026-04-08',ts:'17:00',te:'18:30',cat:'work',fmt:'call'},
+  {id:7, title:"Let's catch up (no work!)",start:'2026-03-30',end:'2026-03-30',ts:'17:00',te:'19:30',cat:'social',fmt:'call'},
+  {id:8, title:"Let's catch up (no work!)",start:'2026-03-30',end:'2026-03-30',ts:'19:00',te:'21:00',cat:'social',fmt:'call'},
+  {id:9, title:"Let's catch up (no work!)",start:'2026-03-31',end:'2026-03-31',ts:'17:00',te:'19:00',cat:'social',fmt:'call'},
+  {id:10,title:"Let's catch up (no work!)",start:'2026-03-31',end:'2026-03-31',ts:'19:00',te:'21:00',cat:'social',fmt:'call'},
+]};
+
+let editId=null, calY=2026, calM=2, friendP=null;
+let currentLinkData=null;
+
+// ── persistence ───────────────────────────────────────────────────
+function saveAll(){
+  ST.name=document.getElementById('org-name').value;
+  try{localStorage.setItem('wsched4',JSON.stringify(ST));}catch(e){}
+  renderList();
+}
+function loadAll(){
+  try{const s=localStorage.getItem('wsched4');if(s)ST=JSON.parse(s);}catch(e){}
+  document.getElementById('org-name').value=ST.name||'';
+  renderList();
+}
+
+// ── encode / decode ───────────────────────────────────────────────
+function encode(p){return btoa(unescape(encodeURIComponent(JSON.stringify(p))));}
+function decode(s){try{return JSON.parse(decodeURIComponent(escape(atob(s.trim()))));}catch(e){return null;}}
+
+// ── URL hash routing ──────────────────────────────────────────────
+// The shareable link looks like:   file:///path/to/scheduler.html#view=ENCODED_PAYLOAD
+// When the friend opens it the hash is read automatically.
+function makeShareURL(payload){
+  const code = encode(payload);
+  // Use current page URL as base, replacing any existing hash
+  const base = window.location.href.split('#')[0];
+  return base + '#view=' + code;
+}
+
+function checkHashOnLoad(){
+  const hash = window.location.hash;
+  if(!hash || !hash.startsWith('#view=')) return false;
+  const code = hash.slice(6);
+  const p = decode(code);
+  if(!p || !p.dates) return false;
+  loadFriendView(p);
+  return true;
+}
+
+// ── link generation ───────────────────────────────────────────────
+function generateLink(){
+  const name = document.getElementById('org-name').value.trim();
+  if(!name){alert('Please enter your name first.');return;}
+  if(!ST.dates.length){alert('Please add at least one date.');return;}
+  const payload = {organizer:name, dates:ST.dates};
+  const url = makeShareURL(payload);
+  currentLinkData = {url, payload};
+  document.getElementById('share-url-text').textContent = url;
+  document.getElementById('link-output').style.display = 'block';
+}
+
+function copyLink(){
+  const url = currentLinkData?.url;
+  if(!url) return;
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(url).then(()=>{
+    btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='Copy link',2000);
+  }).catch(()=>{
+    // fallback: select the text
+    const el = document.getElementById('share-url-text');
+    const range = document.createRange();range.selectNode(el);
+    window.getSelection().removeAllRanges();window.getSelection().addRange(range);
+    try{document.execCommand('copy');btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='Copy link',2000);}catch(e){}
+  });
+}
+
+function previewAsFriend(){
+  if(currentLinkData?.payload) loadFriendView(currentLinkData.payload);
+}
+
+// ── formatters ────────────────────────────────────────────────────
+function fmtD(d){if(!d)return'';const[y,m,dy]=d.split('-');return`${parseInt(dy)} ${MSHORT[+m-1]}`;}
+function fmt12(t){if(!t)return'';const[h,m]=t.split(':').map(Number);return`${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'pm':'am'}`;}
+function metaStr(d){
+  let s=fmtD(d.start);
+  if(d.end&&d.end!==d.start)s+=' – '+fmtD(d.end);
+  if(d.ts){s+=' · '+fmt12(d.ts);if(d.te)s+=' – '+fmt12(d.te);}
+  return s;
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtTag(d){
+  return d.fmt==='call'?'<span class="tag tag-call">📞 Call</span>':
+         d.fmt==='in-person'?'<span class="tag tag-person">🤝 In person</span>':
+         '<span class="tag tag-either">Either</span>';
+}
+
+// ── entry list ────────────────────────────────────────────────────
+function renderList(){
+  const el=document.getElementById('entry-list');
+  if(!ST.dates.length){el.innerHTML='<div class="empty-state">No dates yet</div>';return;}
+  const sorted=[...ST.dates].sort((a,b)=>a.start.localeCompare(b.start));
+  el.innerHTML=sorted.map(d=>`
+    <div class="entry">
+      <div class="e-dot" style="background:${CC[d.cat]||'#888'}"></div>
+      <div class="e-body">
+        <div class="e-title">${esc(d.title)}</div>
+        <div class="e-meta">${esc(metaStr(d))}</div>
+        <div class="e-tags">${fmtTag(d)}<span class="tag tag-${d.cat}">${CL[d.cat]||d.cat}</span></div>
+      </div>
+      <button class="icon-btn" onclick="openEditModal(${d.id})" title="Edit">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 1.5l2.5 2.5-7 7L2 12l.5-2.5 7-7z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+// ── modal ─────────────────────────────────────────────────────────
+function openAddModal(){
+  editId=null;
+  document.getElementById('mo-title').textContent='Add date';
+  document.getElementById('m-save').textContent='Add date';
+  document.getElementById('m-del').style.display='none';
+  ['m-title','m-start','m-end','m-ts','m-te'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('m-cat').value='social';setFmtPill('call');
+  document.getElementById('mo').classList.add('open');
+}
+function openEditModal(id){
+  const d=ST.dates.find(x=>x.id===id);if(!d)return;
+  editId=id;
+  document.getElementById('mo-title').textContent='Edit date';
+  document.getElementById('m-save').textContent='Save';
+  document.getElementById('m-del').style.display='inline-flex';
+  document.getElementById('m-title').value=d.title;
+  document.getElementById('m-start').value=d.start;
+  document.getElementById('m-end').value=d.end||'';
+  document.getElementById('m-ts').value=d.ts||'';
+  document.getElementById('m-te').value=d.te||'';
+  document.getElementById('m-cat').value=d.cat;
+  setFmtPill(d.fmt||'call');
+  document.getElementById('mo').classList.add('open');
+}
+function setFmtPill(v){document.querySelectorAll('#fmt-pills .pill-opt').forEach(p=>p.classList.toggle('active',p.dataset.val===v));}
+function selFmt(el){document.querySelectorAll('#fmt-pills .pill-opt').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
+function moClose(e){if(e.target===document.getElementById('mo'))moCloseDirect();}
+function moCloseDirect(){document.getElementById('mo').classList.remove('open');}
+function saveEntry(){
+  const title=document.getElementById('m-title').value.trim();
+  const start=document.getElementById('m-start').value;
+  if(!title||!start){alert('Please fill in title and start date.');return;}
+  const fmt=document.querySelector('#fmt-pills .pill-opt.active')?.dataset.val||'call';
+  const e={title,start,end:document.getElementById('m-end').value||start,ts:document.getElementById('m-ts').value,te:document.getElementById('m-te').value,cat:document.getElementById('m-cat').value,fmt};
+  if(editId){const i=ST.dates.findIndex(x=>x.id===editId);if(i>-1)ST.dates[i]={...e,id:editId};}
+  else{e.id=Date.now();ST.dates.push(e);}
+  saveAll();moCloseDirect();
+}
+function delEntry(){
+  if(!editId)return;if(!confirm('Delete this date?'))return;
+  ST.dates=ST.dates.filter(x=>x.id!==editId);saveAll();moCloseDirect();
+}
+
+// ── calendar ──────────────────────────────────────────────────────
+function toKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function parseDate(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+
+function buildEvMap(dates){
+  const map={};
+  (dates||[]).forEach(d=>{
+    const s=parseDate(d.start),e=parseDate(d.end||d.start);
+    let cur=new Date(s);
+    while(cur<=e){const k=toKey(cur);if(!map[k])map[k]=[];map[k].push(d);cur.setDate(cur.getDate()+1);}
+  });
+  return map;
+}
+
+function renderCal(dates){
+  document.getElementById('cal-lbl').textContent=`${MON[calM]} ${calY}`;
+  const evMap=buildEvMap(dates);
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  const first=new Date(calY,calM,1);
+  const startDow=(first.getDay()+6)%7;
+  const dim=new Date(calY,calM+1,0).getDate();
+  const prevDim=new Date(calY,calM,0).getDate();
+  const todayKey=toKey(new Date());
+
+  const cells=[];
+  for(let i=startDow-1;i>=0;i--)cells.push({day:prevDim-i,cur:false,date:new Date(calY,calM-1,prevDim-i)});
+  for(let d=1;d<=dim;d++)cells.push({day:d,cur:true,date:new Date(calY,calM,d)});
+  const rem=(7-cells.length%7)%7;
+  for(let d=1;d<=rem;d++)cells.push({day:d,cur:false,date:new Date(calY,calM+1,d)});
+
+  cells.forEach(cell=>{
+    const k=toKey(cell.date);
+    const evs=evMap[k]||[];
+    const hasEv=cell.cur&&evs.length>0;
+    let rc='';
+    if(hasEv){
+      const isStart=evs.some(d=>d.start===k);
+      const isEnd=evs.some(d=>(d.end||d.start)===k);
+      rc=isStart&&isEnd?'r-single':isStart?'r-start':isEnd?'r-end':'r-mid';
+    }
+    const cats=[...new Set(evs.map(d=>d.cat))].slice(0,3);
+    const dots=cats.length&&hasEv?`<div class="cal-dots">${cats.map(c=>`<div class="cal-dot" style="background:${CC[c]}"></div>`).join('')}</div>`:'';
+    const cls=['cal-cell',!cell.cur?'other-month':'',k===todayKey&&cell.cur?'today':'',hasEv?'has-ev':'',rc].filter(Boolean).join(' ');
+    grid.innerHTML+=`<div class="${cls}"${hasEv?` onclick="scrollToEvDay('${k}')"`:''}>${cell.day}${dots}</div>`;
+  });
+
+  // events below calendar
+  const el=document.getElementById('cal-ev-section');
+  if(!dates||!dates.length){el.innerHTML='';return;}
+  const byDay={};
+  [...dates].sort((a,b)=>a.start.localeCompare(b.start)).forEach(d=>{if(!byDay[d.start])byDay[d.start]=[];byDay[d.start].push(d);});
+  let html='';
+  Object.keys(byDay).sort().forEach(day=>{
+    const[y,m,dy]=day.split('-').map(Number);
+    html+=`<div class="cal-day-hd" id="evday-${day}">${dy} ${MSHORT[m-1]} ${y}</div>`;
+    byDay[day].forEach(d=>{
+      let meta='';
+      if(d.end&&d.end!==d.start)meta=`${fmtD(d.start)} – ${fmtD(d.end)}`;
+      if(d.ts)meta+=(meta?' · ':'')+fmt12(d.ts)+(d.te?' – '+fmt12(d.te):'');
+      html+=`<div class="ev-row">
+        <div class="e-dot" style="background:${CC[d.cat]||'#888'};margin-top:5px;flex-shrink:0"></div>
+        <div class="ev-body">
+          <div class="ev-title">${esc(d.title)}</div>
+          ${meta?`<div class="ev-meta">${esc(meta)}</div>`:''}
+          <div class="ev-tags">${fmtTag(d)}<span class="tag tag-${d.cat}">${CL[d.cat]||d.cat}</span></div>
+        </div>
+      </div>`;
+    });
+  });
+  el.innerHTML=html;
+}
+
+function scrollToEvDay(key){const el=document.getElementById('evday-'+key);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function calPrev(){calM--;if(calM<0){calM=11;calY--;}renderCal(friendP?.dates||[]);}
+function calNext(){calM++;if(calM>11){calM=0;calY++;}renderCal(friendP?.dates||[]);}
+
+// ── friend view ───────────────────────────────────────────────────
+function loadFriendView(p){
+  friendP=p;
+  document.getElementById('f-title').textContent=`${p.organizer}'s dates`;
+  const sorted=[...p.dates].sort((a,b)=>a.start.localeCompare(b.start));
+  if(sorted.length){const[y,m]=sorted[0].start.split('-').map(Number);calY=y;calM=m-1;}
+  renderCal(p.dates);
+  // avail list
+  document.getElementById('avail-list').innerHTML=sorted.map(d=>`
+    <div class="avail-card">
+      <div class="avail-tags">${fmtTag(d)}<span class="tag tag-${d.cat}">${CL[d.cat]||d.cat}</span></div>
+      <div class="avail-title">${esc(d.title)}</div>
+      <div class="avail-meta">${esc(metaStr(d))}</div>
+      <div class="avail-btns">
+        <button class="avail-btn" data-id="${d.id}" data-v="yes"   onclick="pickAvail(this)">✓ Yes</button>
+        <button class="avail-btn" data-id="${d.id}" data-v="maybe" onclick="pickAvail(this)">~ Maybe</button>
+        <button class="avail-btn" data-id="${d.id}" data-v="no"    onclick="pickAvail(this)">✕ No</button>
+      </div>
+    </div>`).join('');
+  show('s-friend');
+}
+
+function pickAvail(btn){
+  document.querySelectorAll(`[data-id="${btn.dataset.id}"]`).forEach(b=>b.classList.remove('sel-yes','sel-maybe','sel-no'));
+  btn.classList.add('sel-'+btn.dataset.v);
+}
+
+// ── submit ────────────────────────────────────────────────────────
+function submitAvail(){
+  const name=document.getElementById('f-name').value.trim();
+  const err=document.getElementById('f-err');
+  if(!name){err.textContent='Please enter your name.';return;}
+  const p=friendP;if(!p)return;
+  const answers={};
+  p.dates.forEach(d=>{
+    const a=document.querySelector(`[data-id="${d.id}"].sel-yes,[data-id="${d.id}"].sel-maybe,[data-id="${d.id}"].sel-no`);
+    answers[d.id]=a?a.dataset.v:'none';
+  });
+  const key='wsr4_'+btoa(unescape(encodeURIComponent((p.organizer||'')+(p.dates[0]||{}).start)));
+  let rs=[];
+  try{rs=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+  rs=rs.filter(r=>r.name!==name);
+  rs.push({name,answers,ts:Date.now()});
+  try{
+    localStorage.setItem(key,JSON.stringify(rs));
+    err.textContent='';
+    // clear hash so back-navigation works cleanly
+    history.replaceState(null,'',window.location.pathname+window.location.search);
+    show('s-thanks');
+  }catch(e){err.textContent='Could not save. Please try again.';}
+}
+
+// ── results ───────────────────────────────────────────────────────
+function showResults(){
+  const key='wsr4_'+btoa(unescape(encodeURIComponent((ST.name||'')+(ST.dates[0]||{}).start)));
+  let rs=[];
+  try{rs=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+  const body=document.getElementById('results-body');
+  if(!rs.length){body.innerHTML='<div class="empty-state" style="padding:32px 0">No responses yet.</div>';show('s-results');return;}
+  const sorted=[...ST.dates].sort((a,b)=>a.start.localeCompare(b.start));
+  body.innerHTML=rs.map(r=>`
+    <div class="card" style="margin-bottom:12px">
+      <div style="padding:14px 16px 10px;font-size:15px;font-weight:600;border-bottom:1px solid var(--border)">${esc(r.name)}</div>
+      ${sorted.map(d=>{
+        const a=(r.answers||{})[d.id]||'none';
+        const bc={yes:'rb-yes',maybe:'rb-maybe',no:'rb-no',none:'rb-none'}[a];
+        const bl={yes:'✓ Yes',maybe:'~ Maybe',no:'✕ No',none:'No answer'}[a];
+        return`<div class="entry">
+          <div class="e-dot" style="background:${CC[d.cat]||'#888'}"></div>
+          <div class="e-body"><div class="e-title">${esc(d.title)}</div><div class="e-meta">${esc(metaStr(d))}</div></div>
+          <span class="rb ${bc}">${bl}</span>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+  show('s-results');
+}
+
+// ── nav ───────────────────────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+  window.scrollTo(0,0);
+}
+
+// ── init ──────────────────────────────────────────────────────────
+loadAll();
+// If opened via a share link, go straight to friend view
+if(!checkHashOnLoad()){
+  show('s-home');
+}
+</script>
+</body>
+</html>
